@@ -31,7 +31,7 @@
 
 <?php
      $player = $_POST["player"];
-echo "<h1> Statistques de ";
+echo "<h1> Statistiques de ";
 echo $player;
 echo "</h1>";
 
