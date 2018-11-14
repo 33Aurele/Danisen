@@ -33,10 +33,14 @@
      $handle = fopen("seedings.csv", "r");
 $rank = array();
 $dan = array();
+$rank_change = array();
+$date = "null";
+
 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) 
 {
     $dan[$data[0]] = 0;
     $rank[$data[0]] = $data[1];
+    $rank_change[$data[0]] = 0;
 }
 
 fclose ($handle);
@@ -44,9 +48,17 @@ fclose ($handle);
 $handle = fopen("ft5.csv", "r");
 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) 
 {
+    $ft_date= $data[0];
     $winner = $data[1];
-    $loser = $data[2];
-    $score = $data[3];
+    $loser  = $data[2];
+    $score  = $data[3];
+
+    if ($date != $ft_date) {
+        $date = $ft_date;
+        foreach ($rank as $player => $r) {
+            $rank_change[$player] = 0;
+        }
+    }   
     
     $pt_diff = max(0, 2 + $rank[$winner] - $rank[$loser]);
     
@@ -59,11 +71,13 @@ while (($data = fgetcsv($handle, 1000, ",")) !== FALSE)
     if ($dan[$loser] < -3) {
         $dan[$loser] = 0;
         $rank[$loser]++;
+        $rank_change[$loser] --;
     }
     if ($rank[$winner] == 0 && $dan[$winner] > 4) { $dan[$winner] = 4; }
     if ($rank[$winner] >= 1 && $dan[$winner] >=4) {
         $dan[$winner] = 0;
         $rank[$winner]--;
+        $rank_change[$winner] ++;
         }
 }
 
@@ -81,7 +95,10 @@ for ($i = 0; $i <= 5; $i++) {
             echo $player;
             echo " <mark>";
             echo $dan[$player];
-            echo "</mar></li>";
+            echo "</mark>";
+            if ($rank_change[$player] > 0) { echo " ▲"; }
+            if ($rank_change[$player] < 0) { echo " ▼"; }
+            echo "</li>";
         }
     }
     echo "</ul>";
